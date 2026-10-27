@@ -85,7 +85,7 @@ function toggleLang(){
   document.getElementById('callLbl').textContent=t.call;
   document.getElementById('langBtn').innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" fill="currentColor"/></svg>'+t.toggle;
   document.documentElement.lang=(lang==='hi')?'hi':'en';
-  track(PREFIX+'Lang_'+lang.toUpperCase());
+  track(PREFIX+'Lang_'+lang.toUpperCase(),{lang:lang});
 }
 
 function track(name,props){
@@ -105,13 +105,22 @@ function track(name,props){
 
 function cl(){try{if(window.CleverTap&&window.CleverTap.dismissInAppNotification){window.CleverTap.dismissInAppNotification();return}if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.clevertap){window.webkit.messageHandlers.clevertap.postMessage({action:'dismissInAppNotification'})}}catch(e){}}
 
+var shownAt=Date.now();
+function secs(){return Math.round((Date.now()-shownAt)/1000)}
+
 function trackCall(){
-  track(PREFIX+'Call_Tapped');
+  track(PREFIX+'Call_Tapped',{lang:lang,seconds_on_screen:secs()});
 }
 
 function dismiss(){
-  track(PREFIX+'Cross_Clicked');
+  track(PREFIX+'Cross_Clicked',{lang:lang,seconds_on_screen:secs()});
   cl();
 }
+
+// fire once when the in-app is displayed (bridge can attach a tick late)
+var shownSent=0;
+function sendShown(){if(shownSent)return;shownSent=track(PREFIX+'Shown',{lang:lang})}
+sendShown();
+if(!shownSent){setTimeout(sendShown,300);setTimeout(sendShown,1000)}
 </script>
 </body></html>
