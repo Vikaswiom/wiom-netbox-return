@@ -117,7 +117,7 @@ function dismiss(){
   cl();
 }
 
-// fire once when the in-app is displayed (bridge can attach a tick late)
+/* fire once when the in-app is displayed (bridge can attach a tick late) */
 var shownSent=0;
 function sendShown(){if(shownSent)return;shownSent=track(PREFIX+'Shown',{lang:lang})}
 sendShown();
